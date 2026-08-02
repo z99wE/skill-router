@@ -261,6 +261,47 @@ See [`adapters/README.md`](./adapters/README.md) for full details.
 
 ---
 
+
+
+## 🧠 Learning Loop (NEW in v10!)
+
+The router **learns from your behavior** over time. Every time you see suggestions, it records them. Every time you pick one (or skip it), it learns.
+
+### How It Works
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Router Shows   │────▶│  User Decision   │────▶│  Learning       │
+│  4 Skills       │     │  (Click/Skip)    │     │  Updates        │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+       │                                              │
+       │         If you click "/remotion":           │
+       │         → Boost remotion by +5%            │
+       │         → Record as positive signal         │
+       │                                              │
+       │         If you ignore "marketing-x":        │
+       │         → Demote after 4+ ignores           │
+       │         → Record as negative signal         │
+       ▼                                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Next Time: Better matches based on YOUR usage patterns      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Learn More
+
+```bash
+# See your learning stats
+python3 ~/.claude/skills/skill-router/scripts/learning.py stats
+
+# Reset learning data
+python3 ~/.claude/skills/skill-router/scripts/learning.py reset
+```
+
+**Pro tip:** The router starts learning from day one. After ~20 interactions, you'll notice it gets smarter about what you actually need vs. what's theoretically relevant.
+
+---
+
 ## 🔧 Troubleshooting
 
 ### Skills not showing up?
