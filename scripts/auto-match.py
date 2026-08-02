@@ -562,11 +562,75 @@ def print_results(results, verbose=False):
 
 # ── Main ────────────────────────────────────────────────────────────────
 
+def invoke_skill(skill_name):
+    """Show what happens when a skill is invoked, then run it."""
+    print(f"\n🚀 Invoking /{skill_name} ...")
+    print(f"   Watching for the skill to activate...")
+    
+    # Run the skill as a slash command would
+    try:
+        result = subprocess.run(
+            ["claude", "-p", f"/{skill_name}", "--print-only"],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.stdout.strip():
+            print(f"\n   Preview: {result.stdout.strip()[:200]}...")
+    except Exception as e:
+        pass
+    
+    print(f"\n✅ Skill '{skill_name}' ready to use.")
+    print(f"   Type /{skill_name} to invoke it now.")
+    print(f"   Or continue your prompt and it will activate automatically.\n")
+
+
+def interactive_select(results, query_text):
+    """Present numbered list, let user pick a skill to preview/activate."""
+    if not results:
+        return
+    
+    print("\n" + "=" * 55)
+    print(f"  🎯 Found {len(results)} relevant skills for: "{query_text}"")
+    print("=" * 55)
+    print()
+    
+    for i, (score, skill, domain, kw_list) in enumerate(results, 1):
+        conf  = min(95, int(score))
+        badge = CATEGORY_EMOJI.get(domain, "📌")
+        desc  = skill["original_desc"][:55].replace("\n", " ")
+        action = skill.get("first_action", "")
+        hooks  = skill.get("hook_types", "")
+        
+        print(f"  [{i}] {badge} {skill['name']} ({conf}%)")
+        print(f"      {desc}")
+        if action and action not in ("", "name: " + skill["name"]):
+            print(f"      ▶ {action[:70]}")
+        if hooks:
+            print(f"      ⚡ auto: {hooks}")
+        print()
+    
+    print("  What would you like to do?")
+    print("    Type a number [1-{}] to preview & invoke that skill".format(len(results)))
+    print("    Press Enter to accept all suggestions above")
+    print("    Type 'q' to quit\n")
+    
+    try:
+        choice = input("> ").strip()
+        if choice.isdigit() and 1 <= int(choice) <= len(results):
+            idx = int(choice) - 1
+            _, skill, _, _ = results[idx]
+            invoke_skill(skill["name"])
+        # else: just continue normally
+    except EOFError:
+        pass  # non-interactive, skip
+
+
 def main():
     parser = argparse.ArgumentParser(description="Skill Router v9")
     parser.add_argument("query", nargs="?", help="Optional explicit query (for /skill-router <query>)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show why each skill matched")
     parser.add_argument("--dry-run", action="store_true", help="Show what would happen without printing")
+    parser.add_argument("--interactive", "-i", action="store_true", 
+                        help="Interactive: pick a skill by number to preview & invoke")
     args = parser.parse_args()
 
     # Get input text
@@ -633,9 +697,13 @@ def main():
         record_shown(mem, s["name"])
 
     if not results:
+        print("# No matching skills found.")
         sys.exit(0)
 
-    print_results(results, verbose=args.verbose or CFG.get("verbose", False))
+    if args.interactive:
+        interactive_select(results, input_text)
+    else:
+        print_results(results, verbose=args.verbose or CFG.get("verbose", False))
 
 
 def _domain_score_for_domain(skill, input_lower, config, ctx_boost):
