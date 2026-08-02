@@ -589,7 +589,7 @@ def interactive_select(results, query_text):
         return
     
     print("\n" + "=" * 55)
-    print(f"  🎯 Found {len(results)} relevant skills for: "{query_text}"")
+    print(f'  🎯 Found {len(results)} relevant skills for: "{query_text}"')
     print("=" * 55)
     print()
     
