@@ -1,102 +1,137 @@
-# Claude Skill Router
+# Claude Skill Router v9
 
 Intelligent prompt-to-skill matcher for Claude Code. Analyzes your prompts and suggests the best matching skills from your global library — automatically.
 
-## ✨ Features
+## 🚀 Quick Start
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 1 | **Two-pass domain detection** | Identifies primary + secondary domains from your prompt before ranking |
-| 2 | **Exclusive keyword bonuses** | Skills with domain-specific names get +25 boost |
-| 3 | **Cross-domain disambiguation** | Penalizes skills that score well across multiple domains |
-| 4 | **Auto-index refresh** | Detects when you add/remove skills and silently regenerates the index |
-| 5 | **Explicit query mode** | `/skill-router web scraping` — browse skills without triggering a hook |
-| 6 | **Category badges** | 🎬🔍🎨📣🔬🗺️💰🧪🐍🌐 — instant visual category recognition |
-| 7 | **"Why this skill" explanations** | `--verbose` shows exact keywords that triggered each match |
-| 8 | **Context-aware boosting** | Reads `package.json`, `.gitignore`, etc. to boost relevant domains |
-| 9 | **Session memory** | Won't show the same skill twice in one session |
-| 10 | **Configurable thresholds** | Min confidence, max suggestions, skip patterns — all in `config.json` |
-| 11 | **Debounced execution** | 30s cooldown prevents hook spam (configurable) |
-| 12 | **Personal favorites** | Pin certain skills to always appear first |
-| 13 | **Manual scan command** | `python3 scripts/scan-skills.py --dry-run` to preview indexing |
-| 14 | **Multi-domain ranking** | Shows skills from both primary AND secondary matching domains |
-| 15 | **Trigger column matching** | Checks skill trigger words for higher precision |
-| 16 | **Name partial matching** | Matches multi-word input against skill names (e.g. "landing page" → `landing-page-generator`) |
-| 17 | **Long description penalty** | Generic long descriptions get downweighted to reduce noise |
-| 18 | **Silent background refresh** | Index regeneration happens in <5ms, invisible to user |
-| 19 | **Per-session deduplication** | Tracks shown skills per session to avoid repetition |
-| 20 | **Plugin-structured install** | Drop into `~/.claude/skills/` and hooks auto-register |
-
-## Installation
-
-### One-command install
+### Installation (One Command)
 
 ```bash
-# Clone the repo into your Claude skills directory
-git clone https://github.com/<yourusername>/claude-skill-router.git ~/.claude/skills/skill-router
-
-# Scan your existing skills to build the index
-cd ~/.claude/skills/skill-router && python3 scripts/scan-skills.py
+git clone https://github.com/YOUR_USERNAME/claude-skill-router.git ~/.claude/skills/skill-router
+python3 ~/.claude/skills/skill-router/scripts/scan-skills.py
 ```
 
-That's it. The `UserPromptSubmit` hook will now fire on every prompt.
+That's it. The router will now auto-fire on every prompt (debounced to every 30 seconds).
 
-### What gets installed
+---
 
-```
-~/.claude/skills/skill-router/
-├── SKILL.md                    # Hook definition (auto-registers with Claude Code)
-├── config.json                 # Your configuration
-├── scripts/
-│   ├── auto-match.py           # v9 matching engine
-│   ├── router.sh               # Shell entry point
-│   └── scan-skills.py          # Regenerates skill_index.csv
-└── references/
-    └── skill_index.csv         # Generated index of all your skills
-```
+## 📖 How to Use
 
-## Usage
+### Mode 1: Auto-Match (Default)
 
-### Auto-mode (default)
-
-Just type any prompt. After ~30 seconds since the last run, the router will suggest relevant skills:
+Just type any prompt normally. After ~30 seconds, the router fires and suggests relevant skills:
 
 ```
-> Create a product launch video for my SaaS app
+> Create a product launch video
 
 ┌─────────────────────────────────────────────────────┐
 │  🎯 Relevant Skills                                 │
 └─────────────────────────────────────────────────────┘
 
-  🎬  remotion-to-hyperframes  (82%)
-       Translate an existing Remotion video composition...
+  🎬  1. remotion-to-hyperframes  (73%)
+       Translate an existing Remotion video compositi...
+       ▶ HTML is the source of truth for video...
+       ⚡ auto-hooks configured
 
-  🎬  remotion                 (60%)
-       Remotion CLI integration...
+  💡 Type /skill-name to invoke directly
 ```
 
-### Explicit mode
+**What you see:**
+- **Category badge** — 🎬 Video | 🔍 Code Review | 🎨 Design | 📣 Marketing | etc.
+- **Confidence score** — how well this skill matches your prompt
+- **First action preview** — what happens when you invoke this skill
+- **Hook indicator** — ⚡ means this skill has auto-hooks that fire on invocation
 
-Type `/skill-router <query>` anytime to browse skills without waiting for a hook:
+**To invoke a suggested skill:** Just type `/skill-name` (e.g., `/remotion`)
 
-```
-> /skill-router security audit
+---
 
-🔍  zen-review          (75%)
-🔍  adversarial-reviewer (72%)
-🔍  cso                 (72%)
-```
+### Mode 2: Explicit Query
 
-### Verbose mode
+Search for skills without waiting for the auto-hook:
 
-Add `--verbose` or set `"verbose": true` in config to see why each skill matched:
-
-```
-🔍  adversarial-reviewer  (72%)
-   ↳ matches: code review, review, [trigger] code, [trigger] review
+```bash
+/skill-router security audit
 ```
 
-### Manual index refresh
+Or using the CLI directly:
+```bash
+python3 ~/.claude/skills/skill-router/scripts/auto-match.py "security audit"
+```
+
+This bypasses the 30-second debounce and gives you instant results.
+
+---
+
+### Mode 3: Interactive Selection (NEW!)
+
+Browse skills with full context before picking one:
+
+```bash
+/skill-router marketing --interactive
+```
+
+Or via CLI:
+```bash
+python3 ~/.claude/skills/skill-router/scripts/auto-match.py "marketing strategy" --interactive
+```
+
+You'll see a numbered list like this:
+
+```
+=======================================================
+  🎯 Found 4 relevant skills for: "marketing strategy"
+=======================================================
+
+  [1] 📣 marketing-demand-acquisition (63%)
+      Creates demand generation campaigns, optimizes paid ad spe...
+      ▶ Acquisition playbook for Series A+ startups scaling internationally (EU/US/
+      ⚡ auto: SessionStart
+
+  [2] 📣 marketing-skills (55%)
+      Directory and router for the marketing skills library. ...
+      ▶ This is the index skill for the marketing plugin...
+
+  What would you like to do?
+    Type a number [1-4] to preview & invoke that skill
+    Press Enter to accept all suggestions above
+    Type 'q' to quit
+
+> 1
+🚀 Invoking /marketing-demand-acquisition ...
+   Watching for the skill to activate...
+✅ Skill 'marketing-demand-acquisition' ready to use.
+   Type /marketing-demand-acquisition to invoke it now.
+```
+
+**Benefits:**
+- See exactly what each skill does before picking
+- Choose which one to invoke instead of guessing
+- Preview hook behavior (auto-triggers)
+
+---
+
+### Mode 4: Verbose Explanation
+
+Understand WHY each skill matched:
+
+```bash
+/skill-router code review --verbose
+```
+
+Output shows the matching keywords:
+
+```
+  🔍  1. zen-review              (53%)
+       Expert code reviewer...
+       ↳ matches: review, security audit
+```
+
+Perfect for learning what the router is looking for and tuning your prompts.
+
+---
+
+### Mode 5: Manual Index Refresh
 
 When you add or remove skills, regenerate the index:
 
@@ -104,13 +139,35 @@ When you add or remove skills, regenerate the index:
 python3 ~/.claude/skills/skill-router/scripts/scan-skills.py
 ```
 
-Preview what would be indexed without writing:
-
+Preview what would be indexed (without writing):
 ```bash
 python3 ~/.claude/skills/skill-router/scripts/scan-skills.py --dry-run
 ```
 
-## Configuration
+The router auto-detects changes and refreshes silently (<5ms), but manual refresh is useful after bulk installs.
+
+---
+
+## 🎯 Domains & Examples
+
+The router recognizes **10 domains**. Here's what triggers each:
+
+| Domain | Emoji | Example Prompt |
+|--------|-------|----------------|
+| Video/Animation | 🎬 | "Create a product launch video" |
+| Code Review | 🔍 | "Review my PR for security issues" |
+| Design/UI | 🎨 | "Design a landing page with animations" |
+| Marketing | 📣 | "Write SEO content for our SaaS" |
+| Research | 🔬 | "Research AI papers and write literature review" |
+| Product | 🗺️ | "Create a product roadmap for Q4" |
+| Finance/Business | 💰 | "Analyze revenue metrics and create business plan" |
+| Testing | 🧪 | "Set up Playwright E2E tests" |
+| Coding/Python | 🐍 | "Write Python code to scrape websites" |
+| Coding/Web | 🌐 | "Build a Next.js app with TypeScript" |
+
+---
+
+## ⚙️ Configuration
 
 Edit `~/.claude/skills/skill-router/config.json`:
 
@@ -128,54 +185,85 @@ Edit `~/.claude/skills/skill-router/config.json`:
 }
 ```
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| `min_confidence` | 10 | Minimum score to show a skill |
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `min_confidence` | 10 | Minimum score (0-100) to show a skill |
 | `max_suggestions` | 4 | How many skills to display |
-| `debounce_seconds` | 30 | Cooldown between auto-runs |
-| `skip_patterns` | `["_gstack-command", "pink-twill"]` | Skip these skill names |
-| `personal_favorites` | `[]` | Always boost these skills |
-| `verbose` | `false` | Show matching explanations by default |
+| `debounce_seconds` | 30 | Cooldown between auto-fires |
+| `skip_patterns` | `["_gstack-command", "pink-twill"]` | Always hide these skills |
+| `personal_favorites` | `[]` | Always boost these skills to top |
+| `verbose` | `false` | Show match explanations by default |
 
-## Domains
+---
 
-The router recognizes 10 domains and scores skills within each:
+## 🔧 Troubleshooting
 
-| Domain | Emoji | Key Signals |
-|--------|-------|-------------|
-| Video/Animation | 🎬 | video, animation, render, hyperframes, remotion |
-| Code Review | 🔍 | code review, pr review, debug, vulnerability |
-| Design/UI | 🎨 | ui design, landing page, tailwind, figma |
-| Marketing | 📣 | seo, copywriting, lead generation, funnel |
-| Research | 🔬 | literature review, dossier, competitive analysis |
-| Product | 🗺️ | sprint planning, backlog, agile, roadmap |
-| Finance/Business | 💰 | revenue, profit, mrr, burn rate, pitch deck |
-| Testing | 🧪 | playwright, e2e test, tdd, cypress |
-| Coding/Python | 🐍 | python, django, fastapi, pandas |
-| Coding/Web | 🌐 | typescript, react, nextjs, tailwind |
+### Skills not showing up?
 
-## How It Works
+1. Check if the skill is installed: `ls ~/.claude/skills/`
+2. Rebuild the index: `python3 ~/.claude/skills/skill-router/scripts/scan-skills.py`
+3. Test manually: `python3 ~/.claude/skills/skill-router/scripts/auto-match.py "your query"`
 
-1. **Detect**: Scans your prompt for domain keywords (strong + weak signals)
-2. **Rank**: Scores each skill using exclusive keywords, trigger matches, name overlap, and description word intersection
-3. **Disambiguate**: Applies cross-domain penalty if a skill scores well in multiple domains
-4. **Boost**: Context-aware weighting from project files (`package.json`, `.gitignore`, etc.)
-5. **Refresh**: Silently checks if your skill library changed and regenerates the index if needed
-6. **Output**: Shows top N skills with category emoji badges and optional explanation trails
+### Hook error "No such file or directory"?
 
-## Requirements
+The hook path changed in v9. Update your SKILL.md:
+```
+Old: bash ~/.claude/skills/skill-router/hooks-handlers/auto-match.sh
+New: bash ~/.claude/skills/skill-router/scripts/router.sh
+```
 
-- Python 3.8+
-- Claude Code (for hook registration)
-- Any Claude Code skills installed at `~/.claude/skills/`
+### Want to see more/fewer skills?
 
-## Contributing
+Adjust in `config.json`:
+- `max_suggestions: 6` for more results
+- `min_confidence: 20` for higher precision only
 
-Contributions welcome! Feel free to:
-- Add new domain definitions to `DOMAINS` in `auto-match.py`
-- Improve keyword lists for better matching
-- Submit issues and pull requests
+---
 
-## License
+## 📂 Repository Structure
+
+```
+claude-skill-router/
+├── README.md                 # This file
+├── SKILL.md                  # Hook definition for Claude Code
+├── config.json               # Your configuration
+├── scripts/
+│   ├── auto-match.py         # v9 matching engine (647 lines)
+│   ├── router.sh             # Shell entry point
+│   └── scan-skills.py        # Regenerates skill_index.csv
+└── references/
+    └── skill_index.csv       # Generated index of your skills
+```
+
+---
+
+## 🎓 How It Works
+
+1. **Domain Detection** — Scans your prompt for keywords across 10 domains
+2. **Two-Pass Scoring** — Finds primary domain first, then ranks within it
+3. **Exclusive Bonuses** — Skills with domain-specific names get +25 boost
+4. **Cross-Domain Penalty** — Ambiguous skills get downweighted
+5. **Context Boosting** — Reads project files (`package.json`, `.gitignore`) to bias results
+6. **Auto-Refresh** — Detects when you add/remove skills and rebuilds index silently
+
+---
+
+## 🧪 Testing
+
+Run all test scenarios:
+```bash
+# Test different domains
+python3 scripts/auto-match.py "create a video" --verbose
+python3 scripts/auto-match.py "design a landing page" --interactive
+python3 scripts/auto-match.py "review my PR" --verbose
+python3 scripts/auto-match.py "write marketing copy" --interactive
+
+# Test scan
+python3 scripts/scan-skills.py --dry-run
+```
+
+---
+
+## 📝 License
 
 MIT
