@@ -12,6 +12,11 @@ import sys
 from pathlib import Path
 
 
+
+from codex_adapter import generate_codex_config
+from kiro_adapter import generate_kiro_rules
+from ibm_adapter import generate_ibm_agents
+
 def load_skills(csv_path):
     """Load skills from CSV index."""
     skills = []
@@ -148,7 +153,7 @@ def main():
                         help="Path to skill_index.csv")
     parser.add_argument("--output", "-o", default=str(Path.home()),
                         help="Base output directory")
-    parser.add_argument("--ide", "-i", choices=["all", "cursor", "vscode", "copilot", "opencode"],
+    parser.add_argument("--ide", "-i", choices=["all", "cursor", "vscode", "copilot", "opencode", "codex", "byNara", "ibm"],
                         default="all", help="Which IDEs to generate for")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be generated")
     args = parser.parse_args()
@@ -160,7 +165,15 @@ def main():
         "cursor": generate_cursor_adapters,
         "vscode": generate_vscode_adapters,
         "copilot": generate_copilot_adapters,
-        "opencode": generate_opencode_adapters,
+        "opencode", "codex", "byNara", "ibm": generate_opencode_adapters,
+        "codex": generate_codex_config,
+        "byNara": generate_kiro_rules,
+        "ibm": generate_ibm_agents,
+    }
+        "cursor": generate_cursor_adapters,
+        "vscode": generate_vscode_adapters,
+        "copilot": generate_copilot_adapters,
+        "opencode", "codex", "byNara", "ibm": generate_opencode_adapters,
     }
     
     if args.ide == "all":

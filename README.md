@@ -228,8 +228,9 @@ Works with all major AI coding environments:
 | **VS Code** | ✅ Supported | Extension manifest |
 | **GitHub Copilot** | ✅ Supported | `.github/copilot-instructions.md` |
 | **OpenCode / Antigravity** | ✅ Supported | `.opencode/skills/` |
-| **Codex CLI** | 🔄 Coming Soon | `codex.yaml` adapter |
-| **IBM Watsonx** | 🔄 Coming Soon | `watsonx_skills/` adapter |
+| **Codex CLI** | ✅ Supported | `codex.yaml` adapter |
+| **Amazon byNara** | ✅ Supported | `.byNara/rules/` |
+| **IBM Watsonx (Bob)** | ✅ Supported | `.watsonx/agents/` |
 
 ### Generate For Your IDE
 
@@ -239,8 +240,9 @@ python3 adapters/generate_all.py --output ~/.your-ide-config
 
 # Specific IDE only
 python3 adapters/generate_all.py --ide cursor --output ~/.cursor
-python3 adapters/generate_all.py --ide copilot --output .
-python3 adapters/generate_all.py --ide opencode --output ~/.opencode
+python3 adapters/generate_all.py --ide codex --output ~/.codex
+python3 adapters/generate_all.py --ide byNara --output ~/.byNara
+python3 adapters/generate_all.py --ide ibm --output ~/.watsonx
 ```
 
 ### How It Works
