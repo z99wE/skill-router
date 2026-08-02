@@ -1,0 +1,13 @@
+# Runtime state (regenerated on each use)
+references/last_run.json
+references/session_memory.json
+references/recent_prompts.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db

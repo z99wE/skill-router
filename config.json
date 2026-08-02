@@ -1,0 +1,11 @@
+{
+  "min_confidence": 10,
+  "max_suggestions": 4,
+  "show_every": 5,
+  "skip_patterns": ["_gstack-command", "pink-twill"],
+  "auto_invoke": false,
+  "verbose": false,
+  "debounce_seconds": 30,
+  "version": "9",
+  "personal_favorites": ["remotion", "zen-review"]
+}
