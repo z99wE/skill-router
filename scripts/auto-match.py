@@ -390,7 +390,7 @@ def record_shown(mem, skill_name, skills=None):
             from learning import LearningTracker
             tracker = LearningTracker()
             session_id = str(os.getpid())
-            skill_names = [s["name"] for s in skills[:4]]
+            skill_names = [s[1]["name"] for s in skills[:4]]
             tracker.record_impression(session_id, skill_names)
         except ImportError:
             pass  # Learning module not available
