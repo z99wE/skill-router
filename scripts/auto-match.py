@@ -191,11 +191,24 @@ def load_skill_db():
                     continue
                 if not name or not desc:
                     continue
+                has_hooks = False
+                hook_types = ""
+                first_action = ""
+                if len(row) > 3 and row[3].strip() == "True":
+                    has_hooks = True
+                if len(row) > 4:
+                    hook_types = row[4].strip()
+                if len(row) > 5:
+                    first_action = row[5].strip()
+                
                 skills.append({
                     "name":          name,
                     "desc":          desc.lower(),
                     "triggers":      triggers.lower(),
                     "original_desc": desc,
+                    "has_hooks":     has_hooks,
+                    "hook_types":    hook_types,
+                    "first_action":  first_action,
                 })
     return skills
 
@@ -510,17 +523,37 @@ def print_header():
 
 
 def print_results(results, verbose=False):
+    """Print ranked skills with metadata (hooks, actions, keywords)."""
     if not results:
         return
     print_header()
-    for score, skill, domain, kw_list in results:
-        conf  = min(95, int(score))
-        badge = CATEGORY_EMOJI.get(domain, "📌")
-        desc  = skill["original_desc"][:65].replace("\n", " ")
-        print(f"  {badge}  {skill['name']:<23s}  ({conf}%)")
-        print(f"       {desc}...")
+    for i, (score, skill, domain, kw_list) in enumerate(results, 1):
+        conf   = min(95, int(score))
+        badge  = CATEGORY_EMOJI.get(domain, "📌")
+        desc   = skill["original_desc"][:58].replace("\n", " ")
+        
+        hooks      = skill.get("hook_types", "")
+        action     = skill.get("first_action", "")
+        has_hooks  = skill.get("has_hooks", False)
+        
+        # Build detail lines
+        details = []
+        if action and action not in ("", "name: " + skill["name"]):
+            details.append(f"▶ {action}")
+        if has_hooks:
+            if hooks:
+                details.append(f"⚡ auto-triggers: {hooks}")
+            else:
+                details.append("⚡ auto-hooks configured")
         if verbose and kw_list:
-            print(f"       ↳ matches: {', '.join(kw_list)}")
+            details.append(f"matches: {', '.join(kw_list)}")
+        
+        detail_str = "  ".join(details)
+        
+        print(f"  {badge}  {i}. {skill['name']:<20s}  ({conf}%)")
+        print(f"       {desc}...")
+        if detail_str:
+            print(f"       {detail_str}")
         print("")
     print("  💡 Type /skill-router <query> to search manually")
     print("     Or type /skill-name to invoke directly")
