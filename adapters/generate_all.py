@@ -24,11 +24,8 @@ def load_skills(csv_path):
 
 def generate_cursor_adapters(skills, output_dir):
     """Generate Cursor-compatible skill rules."""
-    output_dir = Path(output_dir)
-    
-    # Main skills file
-    skills_md = output_dir / ".cursor" / "rules" / "skills.md"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = Path(output_dir) / ".cursor" / "rules" / "skills.md"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     
     lines = [
         "# Auto-Generated Skills Index",
@@ -48,18 +45,16 @@ def generate_cursor_adapters(skills, output_dir):
             lines.append(f"- Hooks: {hooks}")
         lines.append("")
     
-    skills_md.write_text('\n'.join(lines))
-    print(f"  ✓ Cursor: {skills_md}")
-    return [skills_md]
+    output_path.write_text('\n'.join(lines))
+    print(f"  ✓ Cursor: {output_path}")
+    return [output_path]
 
 
 def generate_vscode_adapters(skills, output_dir):
     """Generate VS Code extension metadata."""
-    output_dir = Path(output_dir)
+    output_path = Path(output_dir) / "package.json"
     
-    # Package.json snippet
-    package_json = output_dir / "package.json"
-    if not package_json.exists():
+    if not output_path.exists():
         template = {
             "name": "claude-skills",
             "displayName": "Claude Code Skills",
@@ -78,18 +73,16 @@ def generate_vscode_adapters(skills, output_dir):
             }
             template["contributes"]["commands"].append(cmd)
         
-        package_json.write_text(json.dumps(template, indent=2))
-        print(f"  ✓ VS Code: {package_json}")
-        return [package_json]
+        output_path.write_text(json.dumps(template, indent=2))
+        print(f"  ✓ VS Code: {output_path}")
+        return [output_path]
     return []
 
 
 def generate_copilot_adapters(skills, output_dir):
     """Generate GitHub Copilot instructions."""
-    output_dir = Path(output_dir)
-    
-    instructions = output_dir / ".github" / "copilot-instructions.md"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = Path(output_dir) / ".github" / "copilot-instructions.md"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     
     lines = [
         "# Copilot Instructions",
@@ -119,16 +112,14 @@ def generate_copilot_adapters(skills, output_dir):
     lines.append("- `/skill-router <query> --interactive` — Browse and select skills")
     lines.append("- `/skill-router <query> --verbose` — See why skills matched")
     
-    instructions.write_text('\n'.join(lines))
-    print(f"  ✓ Copilot: {instructions}")
-    return [instructions]
+    output_path.write_text('\n'.join(lines))
+    print(f"  ✓ Copilot: {output_path}")
+    return [output_path]
 
 
 def generate_opencode_adapters(skills, output_dir):
     """Generate OpenCode/Antigravity skill format."""
-    output_dir = Path(output_dir)
-    
-    skills_dir = output_dir / ".opencode" / "skills"
+    skills_dir = Path(output_dir) / ".opencode" / "skills"
     skills_dir.mkdir(parents=True, exist_ok=True)
     
     generated = []
