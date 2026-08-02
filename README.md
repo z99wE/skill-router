@@ -224,13 +224,13 @@ Works with all major AI coding environments:
 | IDE | Status | Adapter |
 |-----|--------|---------|
 | **Claude Code** | ✅ Native | Built-in hooks |
-| **Cursor** | ✅ Supported | `.cursor/rules/skills.md` |
-| **VS Code** | ✅ Supported | Extension manifest |
-| **GitHub Copilot** | ✅ Supported | `.github/copilot-instructions.md` |
-| **OpenCode / Antigravity** | ✅ Supported | `.opencode/skills/` |
-| **Codex CLI** | ✅ Supported | `codex.yaml` adapter |
-| **Amazon byNara** | ✅ Supported | `.byNara/rules/` |
-| **IBM Watsonx (Bob)** | ✅ Supported | `.watsonx/agents/` |
+| **Cursor** | ✅ Tested | `.cursor/rules/skills.md` |
+| **VS Code** | ✅ Tested | Extension manifest |
+| **GitHub Copilot** | ✅ Tested | `.github/copilot-instructions.md` |
+| **OpenCode / Antigravity** | ✅ Tested | `.opencode/skills/` |
+| **Codex CLI** | 🔄 Beta | `codex.yaml` (unverified) |
+| **Amazon byNara** | ⚠️ Experimental | Format assumed, not verified |
+| **IBM Watsonx** | ⚠️ Experimental | Format assumed, not verified |
 
 ### Generate For Your IDE
 
@@ -238,10 +238,15 @@ Works with all major AI coding environments:
 # For all supported IDEs
 python3 adapters/generate_all.py --output ~/.your-ide-config
 
-# Specific IDE only
+# Verified IDEs
 python3 adapters/generate_all.py --ide cursor --output ~/.cursor
+python3 adapters/generate_all.py --ide vscode --output ~/your-project
+python3 adapters/generate_all.py --ide copilot --output .
+python3 adapters/generate_all.py --ide opencode --output ~/.opencode
+
+# Beta (untested format assumptions)
 python3 adapters/generate_all.py --ide codex --output ~/.codex
-python3 adapters/generate_all.py --ide byNara --output ~/.byNara
+python3 adapters/generate_all.py --ide bynara --output ~/.byNara
 python3 adapters/generate_all.py --ide ibm --output ~/.watsonx
 ```
 
