@@ -21,6 +21,8 @@ import json
 import os
 import re
 import sys
+from learning import LearningTracker
+
 import time
 from pathlib import Path
 
@@ -370,7 +372,8 @@ def recently_shown(mem, skill_name, window=12):
     return False
 
 
-def record_shown(mem, skill_name):
+def record_shown(mem, skill_name, skills=None):
+    """Record a skill as shown, optionally tracking for learning."""
     sk = get_session_key(_get_session_id())
     if "shown" not in mem:
         mem["shown"] = {}
@@ -380,6 +383,17 @@ def record_shown(mem, skill_name):
     # Keep only last 20
     mem["shown"][sk] = mem["shown"][sk][-20:]
     save_session_memory(mem)
+    
+    # Record impressions for learning if skills list provided
+    if skills:
+        try:
+            from learning import LearningTracker
+            tracker = LearningTracker()
+            session_id = str(os.getpid())
+            skill_names = [s["name"] for s in skills[:4]]
+            tracker.record_impression(session_id, skill_names)
+        except ImportError:
+            pass  # Learning module not available
 
 
 # ── Scoring ─────────────────────────────────────────────────────────────
@@ -624,6 +638,19 @@ def interactive_select(results, query_text):
         pass  # non-interactive, skip
 
 
+def apply_learning_boost(skills, tracker):
+    """Apply learned preferences to skill scores."""
+    for skill in skills:
+        boost = tracker.get_boost(skill["name"])
+        if boost > 0:
+            skill["score"] += boost
+            skill["learning_note"] = f"+{boost} learned"
+        elif boost < 0:
+            skill["score"] += boost
+            skill["learning_note"] = f"{boost} rarely used"
+    return skills
+
+
 def main():
     parser = argparse.ArgumentParser(description="Skill Router v9")
     parser.add_argument("query", nargs="?", help="Optional explicit query (for /skill-router <query>)")
@@ -694,7 +721,7 @@ def main():
 
     # Record shown
     for _, s, _, _ in results:
-        record_shown(mem, s["name"])
+        record_shown(mem, s["name"], results)
 
     if not results:
         print("# No matching skills found.")
