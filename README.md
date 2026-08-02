@@ -15,6 +15,26 @@ That's it. The router will now auto-fire on every prompt (debounced to every 30 
 
 ---
 
+## 🤕 The Problem: You Have 500+ Skills, But Can't Find the Right One
+
+### Sound familiar?
+
+- **You install a bunch of skills** from GitHub repos — video tools, code reviewers, marketing agents, design helpers — and forget half of them
+- **You remember there's a skill for this**… but not *which* skill. You spend 5 minutes scrolling through `~/.claude/skills/` just to find it
+- **You type `/` and pray** — scroll through hundreds of slash commands until you find the right one (if you remember it exists)
+- **You waste time mid-flow** — stop your actual work to search for "what's the command for X?" when you could just keep going
+- **Skills sit unused** — you have powerful tools installed but never use them because discovering them requires conscious effort
+
+### The Core Irritation
+
+**Claude Code skills are powerful but invisible.** You can install 568 skills, but without an intelligent matcher, you're essentially hoarding tools you don't know how to reach. Every time you struggle to remember "is it `/hero-video` or `/product-launch`?", you're fighting your own setup.
+
+The Skill Router fixes this by **bringing skills to you** instead of forcing you to hunt for them. It watches your prompts, understands what you're trying to do, and surfaces the exact skill you need — with a preview of what it does, so you can pick confidently.
+
+---
+
+---
+
 ## 📖 How to Use
 
 ### Mode 1: Auto-Match (Default)
