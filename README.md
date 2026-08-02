@@ -216,6 +216,44 @@ Edit `~/.claude/skills/skill-router/config.json`:
 
 ---
 
+
+## 🔌 Cross-IDE Compatibility
+
+Works with all major AI coding environments:
+
+| IDE | Status | Adapter |
+|-----|--------|---------|
+| **Claude Code** | ✅ Native | Built-in hooks |
+| **Cursor** | ✅ Supported | `.cursor/rules/skills.md` |
+| **VS Code** | ✅ Supported | Extension manifest |
+| **GitHub Copilot** | ✅ Supported | `.github/copilot-instructions.md` |
+| **OpenCode / Antigravity** | ✅ Supported | `.opencode/skills/` |
+| **Codex CLI** | 🔄 Coming Soon | `codex.yaml` adapter |
+| **IBM Watsonx** | 🔄 Coming Soon | `watsonx_skills/` adapter |
+
+### Generate For Your IDE
+
+```bash
+# For all supported IDEs
+python3 adapters/generate_all.py --output ~/.your-ide-config
+
+# Specific IDE only
+python3 adapters/generate_all.py --ide cursor --output ~/.cursor
+python3 adapters/generate_all.py --ide copilot --output .
+python3 adapters/generate_all.py --ide opencode --output ~/.opencode
+```
+
+### How It Works
+
+1. **Read** the canonical `skill_index.csv` (557+ skills)
+2. **Transform** each skill into the target IDE's format
+3. **Output** files in the correct location
+4. **Sync** automatically when you add/remove skills
+
+See [`adapters/README.md`](./adapters/README.md) for full details.
+
+---
+
 ## 🔧 Troubleshooting
 
 ### Skills not showing up?
