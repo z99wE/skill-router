@@ -17,7 +17,7 @@ hooks:
     - matcher: "*"
       hooks:
         - type: command
-          command: "bash ~/.claude/skills/skill-router/hooks-handlers/auto-match.sh"
+          command: "bash ~/.claude/skills/skill-router/scripts/router.sh"
           timeout: 5
 ---
 
