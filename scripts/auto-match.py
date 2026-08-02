@@ -664,11 +664,11 @@ def main():
     if args.query:
         input_text = args.query
     else:
+        # Read from environment variable (set by Claude Code hooks)
         input_text = os.environ.get("CLAUDE_INPUT", "")
-        if not input_text and not sys.stdin.isatty():
-            input_text = sys.stdin.read().strip()
-    if not input_text:
-        sys.exit(0)
+        # If empty, don't auto-fire with stale data — exit silently
+        if not input_text:
+            sys.exit(0)
 
     # Debounce (only for auto-hook, not explicit invocation)
     if not args.query:
